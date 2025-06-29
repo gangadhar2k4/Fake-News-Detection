@@ -16,6 +16,13 @@ DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 
+# CSRF and CORS settings for Replit
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.replit.dev',
+    'https://*.replit.app',
+    'https://*.replit.co',
+]
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
