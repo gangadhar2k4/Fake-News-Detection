@@ -107,8 +107,12 @@ The application follows Django's app-based architecture with three main apps:
 - **WSGI**: Production-ready WSGI configuration
 
 ## Changelog
-- June 29, 2025. Initial setup
+- June 29, 2025. Initial setup with ML-based verification
+- June 29, 2025. Converted to API-based verification system
+- June 29, 2025. Simplified interface to look more normal, removed complex features and charts
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Interface style: Normal and simple, not overly professional
+Features: Minimal complexity, streamlined functionality
