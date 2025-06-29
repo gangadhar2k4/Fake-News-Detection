@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Set Up Grok AI - News Checker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="text-center mb-4">
+            <h1 class="h2">Set Up Grok AI</h1>
+            <p class="text-muted">Get advanced news verification with Grok AI</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5>Why Use Grok AI?</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-success">With Grok AI</h6>
+                        <ul class="text-muted">
+                            <li>Advanced fact-checking</li>
+                            <li>Detailed analysis</li>
+                            <li>Credibility scoring</li>
+                            <li>Issue identification</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-warning">Demo Mode</h6>
+                        <ul class="text-muted">
+                            <li>Basic keyword matching</li>
+                            <li>Simple predictions</li>
+                            <li>Limited insights</li>
+                            <li>No detailed analysis</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h5>Setup Steps</h5>
+                <ol class="mb-4">
+                    <li>Visit <a href="https://console.x.ai/" target="_blank" class="text-decoration-none">console.x.ai</a></li>
+                    <li>Create an account (free trial available)</li>
+                    <li>Click "Manage API keys" → "Create API key"</li>
+                    <li>Copy your API key (starts with "xai-")</li>
+                    <li>In Replit: Go to Secrets tab → Add key: <code>XAI_API_KEY</code></li>
+                    <li>Paste your API key as the value</li>
+                </ol>
+
+                <div class="alert alert-info">
+                    <strong>Free Trial:</strong> Grok AI offers free credits for testing. Perfect for trying out the enhanced verification features.
+                </div>
+
+                <div class="text-center">
+                    <a href="{% url 'verifier:verify' %}" class="btn btn-primary">Back to Verification</a>
+                    <a href="https://console.x.ai/" target="_blank" class="btn btn-outline-secondary">Get API Key</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

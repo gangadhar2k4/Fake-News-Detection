@@ -2,6 +2,7 @@ import requests
 import os
 import re
 from django.conf import settings
+from .grok_verifier import GrokNewsVerifier
 
 
 class TextPreprocessor:
@@ -29,18 +30,31 @@ class TextPreprocessor:
 
 
 class APINewsVerifier:
-    """News verification using external API services"""
+    """News verification using Grok AI and external API services"""
     
     def __init__(self):
+        self.grok_verifier = GrokNewsVerifier()
         self.api_key = os.getenv('NEWS_VERIFICATION_API_KEY')
         self.preprocessor = TextPreprocessor()
         
     def verify_news(self, text, title=""):
-        """Verify news using API service"""
+        """Verify news using Grok AI or fallback API service"""
         try:
-            if not self.api_key:
-                # Use demo mode for testing without API key
+            # Try Grok AI first
+            return self.grok_verifier.verify_news(text, title)
+        except Exception as e:
+            print(f"Grok verification error: {e}")
+            
+            # Fallback to original API if available
+            if self.api_key:
+                return self._legacy_api_verification(text, title)
+            else:
+                # Use demo mode for testing without any API key
                 return self._demo_verification(text, title)
+    
+    def _legacy_api_verification(self, text, title=""):
+        """Legacy API verification method"""
+        try:
             
             # Clean the input text
             cleaned_text = self.preprocessor.clean_text(text)

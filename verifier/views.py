@@ -198,3 +198,8 @@ def update_trending_topics(category, title, content):
             if not created:
                 topic.verification_count += 1
                 topic.save()
+
+
+def grok_setup(request):
+    """View for Grok AI setup instructions"""
+    return render(request, 'verifier/grok_setup.html')
