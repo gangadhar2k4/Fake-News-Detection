@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Fake News Detector{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="h3 mb-2">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Welcome back, {{ user.first_name|default:user.username }}!
+                        </h1>
+                        <p class="mb-0 opacity-75">
+                            Ready to verify more news? Your vigilance helps combat misinformation.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a href="{% url 'verifier:verify' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-plus-circle me-2"></i>Verify News
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h2 class="h4 mb-0">{{ total_checks }}</h2>
+                        <p class="mb-0">Total Articles Checked</p>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-newspaper fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h2 class="h4 mb-0">{{ true_news_count }}</h2>
+                        <p class="mb-0">True News</p>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-danger text-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h2 class="h4 mb-0">{{ fake_news_count }}</h2>
+                        <p class="mb-0">Fake News</p>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card bg-warning text-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h2 class="h4 mb-0">{{ bookmarked_count }}</h2>
+                        <p class="mb-0">Bookmarked Articles</p>
+                    </div>
+                    <div class="ms-3">
+                        <i class="fas fa-bookmark fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-lg-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Verification Activity (Last 6 Months)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-pie-chart me-2"></i>Results Breakdown
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="resultsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity and Trending Topics -->
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>Recent Verification Results
+                </h5>
+                <a href="{% url 'verifier:history' %}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_checks %}
+                    <div class="list-group list-group-flush">
+                        {% for check in recent_checks %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ check.title|truncatechars:60 }}</h6>
+                                        <p class="mb-1 text-muted small">{{ check.content_preview }}</p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>{{ check.created_at|date:"M d, Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div class="ms-3">
+                                        {% if check.prediction == 'True' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>True
+                                            </span>
+                                        {% elif check.prediction == 'Fake' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Fake
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-question me-1"></i>Partial
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No verification results yet</h6>
+                        <p class="text-muted mb-3">Start by verifying your first news article!</p>
+                        <a href="{% url 'verifier:verify' %}" class="btn btn-primary">
+                            <i class="fas fa-shield-alt me-2"></i>Verify News
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-fire me-2"></i>Trending Topics
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if trending_topics %}
+                    <div class="list-group list-group-flush">
+                        {% for topic in trending_topics %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <i class="fas fa-hashtag text-muted me-2"></i>
+                                    {{ topic.topic }}
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ topic.verification_count|floatformat:0 }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-chart-bar fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">No trending topics yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Quick Stats
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 border-end">
+                        <div class="h4 text-primary mb-0">{{ weekly_checks }}</div>
+                        <small class="text-muted">This Week</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="h4 text-success mb-0">{{ partially_true_count }}</div>
+                        <small class="text-muted">Partially True</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Data Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Monthly Activity Chart
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    const monthlyData = {{ monthly_data|safe }};
+    
+    new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+            labels: monthlyData.map(item => item.month),
+            datasets: [{
+                label: 'Articles Verified',
+                data: monthlyData.map(item => item.checks),
+                borderColor: '#0d6efd',
+                backgroundColor: '#0d6efd20',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Results Pie Chart
+    const resultsCtx = document.getElementById('resultsChart').getContext('2d');
+    
+    new Chart(resultsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['True News', 'Fake News', 'Partially True'],
+            datasets: [{
+                data: [{{ true_news_count }}, {{ fake_news_count }}, {{ partially_true_count }}],
+                backgroundColor: ['#198754', '#dc3545', '#ffc107'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
