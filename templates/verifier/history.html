@@ -83,7 +83,7 @@
                                                         {{ result.prediction }}
                                                     </span>
                                                     <span class="badge bg-info">
-                                                        {{ result.confidence|floatformat:1|mul:100 }}% confidence
+                                                        {% widthratio result.confidence 1 100 %}% confidence
                                                     </span>
                                                 </div>
                                                 <small class="text-muted">
@@ -100,7 +100,7 @@
                                                 <small class="text-muted">Confidence Level</small>
                                                 <div class="progress" style="height: 8px;">
                                                     <div class="progress-bar {% if result.confidence > 0.7 %}bg-success{% elif result.confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
-                                                         style="width: {{ result.confidence|floatformat:0|mul:100 }}%">
+                                                         style="width: {% widthratio result.confidence 1 100 %}%">
                                                     </div>
                                                 </div>
                                             </div>
@@ -144,7 +144,7 @@
                                                     </span>
                                                 </div>
                                                 <div class="mb-2">
-                                                    <strong>Confidence:</strong> {{ result.confidence|floatformat:1|mul:100 }}%
+                                                    <strong>Confidence:</strong> {% widthratio result.confidence 1 100 %}%
                                                 </div>
                                                 <div class="mb-2">
                                                     <strong>Category:</strong> {{ result.category }}

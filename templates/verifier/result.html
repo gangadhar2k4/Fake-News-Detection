@@ -57,8 +57,8 @@
                             </div>
                             <div class="progress mb-3">
                                 <div class="progress-bar {% if result.logistic_confidence > 0.7 %}bg-success{% elif result.logistic_confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
-                                     style="width: {{ result.logistic_confidence|floatformat:0|mul:100 }}%">
-                                    {{ result.logistic_confidence|floatformat:1|mul:100 }}%
+                                     style="width: {% widthratio result.logistic_confidence 1 100 %}%">
+                                    {% widthratio result.logistic_confidence 1 100 %}%
                                 </div>
                             </div>
                         </div>
@@ -75,8 +75,8 @@
                             </div>
                             <div class="progress mb-3">
                                 <div class="progress-bar {% if result.tree_confidence > 0.7 %}bg-success{% elif result.tree_confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
-                                     style="width: {{ result.tree_confidence|floatformat:0|mul:100 }}%">
-                                    {{ result.tree_confidence|floatformat:1|mul:100 }}%
+                                     style="width: {% widthratio result.tree_confidence 1 100 %}%">
+                                    {% widthratio result.tree_confidence 1 100 %}%
                                 </div>
                             </div>
                         </div>
@@ -89,8 +89,8 @@
                             <h6>Overall Confidence</h6>
                             <div class="progress">
                                 <div class="progress-bar {% if result.confidence > 0.7 %}bg-success{% elif result.confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
-                                     style="width: {{ result.confidence|floatformat:0|mul:100 }}%">
-                                    {{ result.confidence|floatformat:1|mul:100 }}%
+                                     style="width: {% widthratio result.confidence 1 100 %}%">
+                                    {% widthratio result.confidence 1 100 %}%
                                 </div>
                             </div>
                         </div>
