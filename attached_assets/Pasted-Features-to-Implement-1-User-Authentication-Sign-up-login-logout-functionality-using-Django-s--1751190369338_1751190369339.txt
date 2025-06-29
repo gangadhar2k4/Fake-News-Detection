@@ -1,0 +1,94 @@
+Features to Implement:
+✅ 1. User Authentication
+Sign up, login, logout functionality using Django's built-in auth system
+
+Dashboard access restricted to authenticated users
+
+✅ 2. Dashboard Overview
+Show a welcome message with the logged-in username
+
+Display statistics:
+
+Total articles checked
+
+Count of "True News" and "Fake News"
+
+Count of saved or bookmarked articles
+
+✅ 3. News Verification
+A form where users can paste a headline or full article text
+
+On submit, the backend should:
+
+Preprocess the input text
+
+Run both Logistic Regression and Decision Tree Classifier
+
+Display the predicted result ("True", "Fake", or "Partially True")
+
+Optionally save the result with timestamp to user's history
+
+✅ 4. Recent Checks
+Show a list of the latest articles the user verified
+
+Include:
+
+Title/content preview
+
+Result label (True, Fake, Partial)
+
+Date of verification
+
+✅ 5. Trending Topics
+A static or dynamic list of trending topics with number of verifications
+
+Can be faked initially with dummy data (e.g., "Quantum Computing – 1,873 checks")
+
+✅ 6. Search History & Stats
+Each user should have their own history (article, result, date)
+
+Include filters by result type (True/Fake) and optional category (e.g., Tech, Politics)
+
+🧠 ML Model Requirements:
+Use scikit-learn with vectorization (CountVectorizer or TF-IDF)
+
+Train on a dataset like FakeNewsNet, LIAR dataset, or Kaggle’s “Fake and Real News”
+
+Preprocess text: remove stopwords, punctuation, lowercase, etc.
+
+Save models using joblib or pickle for inference
+
+Load and use models during verification in Django views
+
+🔧 Technical Details:
+Use Django templates for frontend rendering
+
+Use Bootstrap or custom CSS for UI layout
+
+Include CSRF protection in forms
+
+Organize project into Django apps:
+
+accounts (auth)
+
+verifier (verification logic)
+
+dashboard (user stats and history)
+
+🌟 Optional Enhancements:
+Add AJAX form submission for verifying articles without page reload
+
+Show charts (Bar, Pie) for stats using Chart.js
+
+Add category selection dropdown for the article (e.g., tech, politics, etc.)
+
+Save and show average prediction confidence if model supports probability output
+
+🔚 Deliverables:
+Full Django project code with all templates and static files
+
+Trained ML models saved and ready to use
+
+README with setup instructions
+
+Sample data to test the system
