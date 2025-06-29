@@ -47,38 +47,29 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h6>
-                                <i class="fas fa-robot me-2"></i>Logistic Regression Model
+                                <i class="fas fa-shield-alt me-2"></i>Verification Result
                             </h6>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span>Prediction:</span>
-                                <span class="badge {% if result.logistic_prediction == 'True' %}bg-success{% elif result.logistic_prediction == 'Fake' %}bg-danger{% else %}bg-warning{% endif %}">
-                                    {{ result.logistic_prediction }}
+                                <span class="badge {% if result.prediction == 'True' %}bg-success{% elif result.prediction == 'Fake' %}bg-danger{% else %}bg-warning{% endif %} fs-6">
+                                    {{ result.prediction }}
                                 </span>
-                            </div>
-                            <div class="progress mb-3">
-                                <div class="progress-bar {% if result.logistic_confidence > 0.7 %}bg-success{% elif result.logistic_confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
-                                     style="width: {% widthratio result.logistic_confidence 1 100 %}%">
-                                    {% widthratio result.logistic_confidence 1 100 %}%
-                                </div>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
                             <h6>
-                                <i class="fas fa-tree me-2"></i>Decision Tree Model
+                                <i class="fas fa-chart-line me-2"></i>Confidence Level
                             </h6>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span>Prediction:</span>
-                                <span class="badge {% if result.tree_prediction == 'True' %}bg-success{% elif result.tree_prediction == 'Fake' %}bg-danger{% else %}bg-warning{% endif %}">
-                                    {{ result.tree_prediction }}
-                                </span>
-                            </div>
-                            <div class="progress mb-3">
-                                <div class="progress-bar {% if result.tree_confidence > 0.7 %}bg-success{% elif result.tree_confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
-                                     style="width: {% widthratio result.tree_confidence 1 100 %}%">
-                                    {% widthratio result.tree_confidence 1 100 %}%
+                            <div class="progress mb-2">
+                                <div class="progress-bar {% if result.confidence > 0.7 %}bg-success{% elif result.confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                     style="width: {% widthratio result.confidence 1 100 %}%">
+                                    {% widthratio result.confidence 1 100 %}%
                                 </div>
                             </div>
+                            <small class="text-muted">
+                                Confidence: {% widthratio result.confidence 1 100 %}%
+                            </small>
                         </div>
                     </div>
 
@@ -86,17 +77,26 @@
 
                     <div class="row">
                         <div class="col-md-6">
-                            <h6>Overall Confidence</h6>
-                            <div class="progress">
-                                <div class="progress-bar {% if result.confidence > 0.7 %}bg-success{% elif result.confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
-                                     style="width: {% widthratio result.confidence 1 100 %}%">
-                                    {% widthratio result.confidence 1 100 %}%
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <h6>Category</h6>
                             <span class="badge bg-primary">{{ category|default:"General" }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Verification Method</h6>
+                            {% if result.error and 'API key not configured' in result.error %}
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-cog me-1"></i>Demo Mode
+                                </span>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Configure NEWS_VERIFICATION_API_KEY for real verification
+                                    </small>
+                                </div>
+                            {% else %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-cloud me-1"></i>API-Based Analysis
+                                </span>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

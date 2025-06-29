@@ -33,11 +33,11 @@ The application follows Django's app-based architecture with three main apps:
 - **Login/Logout**: Django's built-in authentication views with custom templates
 - **Access Control**: Login-required decorators protect authenticated routes
 
-### Machine Learning Pipeline
+### API-Based Verification Pipeline
 - **Text Preprocessing**: Custom TextPreprocessor class handles cleaning, URL removal, and text normalization
-- **Models**: Dual-model approach using Logistic Regression and Decision Tree Classifier
-- **Feature Extraction**: TF-IDF vectorization for text-to-numeric conversion
-- **Prediction Logic**: Ensemble approach combining multiple model outputs
+- **External API Integration**: Uses NEWS_VERIFICATION_API_KEY for fact-checking services
+- **Fallback System**: Demo mode with simulated predictions when API key is not configured
+- **Error Handling**: Comprehensive error handling for API failures, timeouts, and authentication issues
 
 ### Data Models
 - **VerificationResult**: Stores user verification history with title, content, prediction, confidence, category, and bookmarking

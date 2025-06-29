@@ -110,5 +110,5 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 
-# ML Models directory
-ML_MODELS_DIR = BASE_DIR / 'ml_models'
+# API Configuration
+NEWS_VERIFICATION_API_KEY = os.getenv('NEWS_VERIFICATION_API_KEY')
