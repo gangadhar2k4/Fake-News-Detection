@@ -382,3 +382,10 @@ footer {
         background-color: white !important;
     }
 }
+
+.btn-group-form {
+    display: inline;
+}
+.btn-group-form button {
+    border-radius: 0 !important; /* remove extra rounding */
+}

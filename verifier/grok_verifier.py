@@ -2,26 +2,23 @@
 Grok AI News Verification System
 Uses xAI's Grok models for intelligent news fact-checking
 """
-
-import os
 import json
 import requests
 from typing import Dict, Any, Optional
-
+from fake_news_detector.settings import NEWS_VERIFICATION_API_KEY
 
 class GrokNewsVerifier:
     """News verification using Grok AI models"""
     
     def __init__(self):
-        self.api_key = os.getenv('XAI_API_KEY')
-        self.base_url = "https://api.x.ai/v1"
-        self.model = "grok-beta"  # Using the main Grok model
-        
+        self.api_key = NEWS_VERIFICATION_API_KEY
+        # self.base_url = "https://api.x.ai/v1"
+        self.base_url = "https://api.groq.com/openai/v1"
+        # self.model = "grok-beta"  # Using the main Grok model
+        self.model = "llama3-70b-8192"
+
     def verify_news(self, text: str, title: str = "") -> Dict[str, Any]:
-        """
-        Verify news using Grok AI
-        Returns prediction, confidence, and analysis
-        """
+
         if not self.api_key:
             return self._demo_verification(text, title)
             
@@ -32,7 +29,6 @@ class GrokNewsVerifier:
             return self._demo_verification(text, title)
     
     def _call_grok_api(self, text: str, title: str = "") -> Dict[str, Any]:
-        """Make API call to Grok for news verification"""
         
         # Combine title and content for analysis
         content = f"Headline: {title}\n\nContent: {text}" if title else text
@@ -92,19 +88,39 @@ class GrokNewsVerifier:
         
         result = response.json()
         content = result['choices'][0]['message']['content']
-        
+        import re
+        json_match = re.search(r'\{.*?\}', content, re.DOTALL)
+
         # Parse the JSON response
-        try:
-            analysis = json.loads(content)
+        # try:
+        #     analysis = json.loads(content)
+        #     return {
+        #         'prediction': analysis.get('prediction'),
+        #         'confidence': float(analysis.get('confidence', 0.5)),
+        #         'analysis': analysis.get('analysis', 'Analysis completed'),
+        #         'key_issues': analysis.get('key_issues', []),
+        #         'credibility_score': float(analysis.get('credibility_score', 0.5))
+        #     }
+        # except json.JSONDecodeError:
+        #     # Fallback if JSON parsing fails
+        #     return {
+        #         'prediction': 'Partially True',
+        #         'confidence': 0.5,
+        #         'analysis': content[:200] + "...",
+        #         'key_issues': [],
+        #         'credibility_score': 0.5
+        #     }
+
+        if json_match:
+            analysis = json.loads(json_match.group())
             return {
-                'prediction': analysis.get('prediction', 'Partially True'),
+                'prediction': analysis.get('prediction'),
                 'confidence': float(analysis.get('confidence', 0.5)),
                 'analysis': analysis.get('analysis', 'Analysis completed'),
                 'key_issues': analysis.get('key_issues', []),
                 'credibility_score': float(analysis.get('credibility_score', 0.5))
             }
-        except json.JSONDecodeError:
-            # Fallback if JSON parsing fails
+        else:
             return {
                 'prediction': 'Partially True',
                 'confidence': 0.5,
@@ -115,7 +131,7 @@ class GrokNewsVerifier:
     
     def _demo_verification(self, text: str, title: str = "") -> Dict[str, Any]:
         """Demo verification for testing without API key"""
-        
+        # print("Using demo funtion")
         # Simple keyword-based demo logic
         content = (title + " " + text).lower()
         
@@ -144,5 +160,5 @@ class GrokNewsVerifier:
             'confidence': confidence,
             'analysis': analysis,
             'key_issues': ['Demo mode - get XAI_API_KEY for full analysis'],
-            'credibility_score': confidence
+            'credibility_score': confidence,
         }

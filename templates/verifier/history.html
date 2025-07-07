@@ -105,7 +105,7 @@
                                                 </div>
                                             </div>
                                             <!-- Actions -->
-                                            <div class="btn-group btn-group-sm" role="group">
+                                            {% comment %} <div class="btn-group btn-group-sm" role="group">
                                                 <form method="post" action="{% url 'verifier:toggle_bookmark' result.id %}" class="d-inline">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn {% if result.is_bookmarked %}btn-warning{% else %}btn-outline-warning{% endif %}" title="{% if result.is_bookmarked %}Remove bookmark{% else %}Bookmark{% endif %}">
@@ -121,7 +121,35 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
+                                            </div> {% endcomment %}
+
+                                            <div class="btn-group btn-group-sm justify-content-end" role="group">
+                                                <!-- Bookmark Button -->
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <!-- Bookmark Button -->
+                                                    <form method="post" action="{% url 'verifier:toggle_bookmark' result.id %}" class="m-0">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm {% if result.is_bookmarked %}btn-warning{% else %}btn-outline-warning{% endif %}" title="{% if result.is_bookmarked %}Remove bookmark{% else %}Bookmark{% endif %}">
+                                                            <i class="fas fa-bookmark"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    <!-- Details Button -->
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#details-{{ result.id }}" title="View details">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
+
+                                                    <!-- Delete Button -->
+                                                    <form method="post" action="{% url 'verifier:delete_result' result.id %}" class="m-0" onsubmit="return confirm('Are you sure you want to delete this result?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>

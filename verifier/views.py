@@ -6,13 +6,16 @@ from django.db.models import Q
 from django.http import JsonResponse
 from .forms import NewsVerificationForm, HistoryFilterForm
 from .models import VerificationResult, TrendingTopic
-from .ml_utils import FakeNewsDetector
+# modified by ganga
+# from .ml_utils import FakeNewsDetector
 import json
+from .ml_utils import APINewsVerifier
 
+# Initialize the ML detector 
+# modified
+# detector = FakeNewsDetector()
 
-# Initialize the ML detector
-detector = FakeNewsDetector()
-
+detector = APINewsVerifier()
 
 @login_required
 def verify_news(request):
@@ -27,13 +30,16 @@ def verify_news(request):
             
             # Use title + content for prediction, or just content if no title
             text_to_analyze = f"{title} {content}".strip() if title else content
-            
             # Get ML prediction
-            result = detector.predict(text_to_analyze)
+            # modified
+            # result = detector.predict(text_to_analyze)
+
+            # Get API prediction
+            result = detector.verify_news(text_to_analyze)
             
             # Save to history if requested
             verification_result = None
-            if save_to_history and result['error'] is None:
+            if save_to_history:
                 verification_result = VerificationResult.objects.create(
                     user=request.user,
                     title=title or content[:100] + '...' if len(content) > 100 else content,
@@ -42,10 +48,9 @@ def verify_news(request):
                     confidence=result['confidence'],
                     category=category
                 )
-                
                 # Update trending topics
                 update_trending_topics(category, title, content)
-            
+
             # Prepare context for result page
             context = {
                 'result': result,

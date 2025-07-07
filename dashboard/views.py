@@ -18,13 +18,10 @@ def dashboard(request):
     partially_true_count = VerificationResult.objects.filter(user=user, prediction='Partially True').count()
     bookmarked_count = VerificationResult.objects.filter(user=user, is_bookmarked=True).count()
     
-    # Recent checks (last 5)
     recent_checks = VerificationResult.objects.filter(user=user)[:5]
     
-    # Trending topics
     trending_topics = get_trending_topics()
     
-    # Weekly activity (last 7 days)
     week_ago = datetime.now() - timedelta(days=7)
     weekly_checks = VerificationResult.objects.filter(
         user=user,
