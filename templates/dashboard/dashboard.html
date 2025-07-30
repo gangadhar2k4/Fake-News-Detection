@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Fake News Detector{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="h4 mb-2">
+                            Welcome back, {{ user.first_name|default:user.username }}
+                        </h1>
+                        <p class="mb-0 text-muted">
+                            Check news articles for authenticity
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a href="{% url 'verifier:verify' %}" class="btn btn-primary">
+                            Check News
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Stats -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 mb-4">
+    <div class="col">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h3 class="h5 mb-1">{{ total_checks }}</h3>
+                <p class="text-muted mb-0">Articles Checked</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h3 class="h5 mb-1">{{ true_news_count }}</h3>
+                <p class="text-muted mb-0">Verified True</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h3 class="h5 mb-1">{{ partially_true_count }}</h3>
+                <p class="text-muted mb-0">Partially Verified</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h3 class="h5 mb-1">{{ fake_news_count }}</h3>
+                <p class="text-muted mb-0">Detected Fake</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Checks</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_checks %}
+                    {% for check in recent_checks|slice:":5" %}
+                        <div class="border-bottom py-2">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">{{ check.title|default:"(Untitled)"|truncatechars:50 }}</h6>
+                                    <small class="text-muted">{{ check.created_at|default:"Unknown Date"|date:"M d, Y" }}</small>
+                                </div>
+                                <span class="badge d-flex align-items-center justify-content-center 
+                                    {% if check.prediction == 'True' %}bg-success
+                                    {% elif check.prediction == 'Fake' %}bg-danger
+                                    {% else %}bg-warning{% endif %}" style="min-width: 100px;font-size: 14px;;">
+                                    {{ check.prediction }}
+                                </span>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'verifier:history' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="text-muted mb-3">No articles checked yet</p>
+                        <a href="{% url 'verifier:verify' %}" class="btn btn-primary">Check Your First Article</a>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

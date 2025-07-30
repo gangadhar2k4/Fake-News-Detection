@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify News - Fake News Detector{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="h2">Check News Article</h1>
+            <p class="text-muted">
+                Enter any news article or headline to verify its authenticity
+            </p>
+            <div class="alert alert-info">
+                <small>Currently using demo mode. <a href="{% url 'verifier:grok_setup' %}" class="alert-link">Set up Grok AI</a> for advanced analysis</small>
+            </div>
+        </div>
+
+        <!-- Verification Form -->
+        <div class="card">
+            <div class="card-body">
+                <form method="post" id="verifyForm">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                            {{ form.title.label }}
+                        </label>
+                        {{ form.title }}
+                        <div class="form-text">Optional</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select name="category" id="category" class="form-select">
+                            <option value="">Select Category</option>
+                            <option value="Politics">Politics</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Health">Health</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Business">Business</option>
+                            <option value="Science">Science</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">
+                            {{ form.content.label }} *
+                        </label>
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.content.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-check mb-3">
+                        {{ form.save_to_history }}
+                        <label class="form-check-label" for="{{ form.save_to_history.id_for_label }}">
+                            {{ form.save_to_history.label }}
+                        </label>
+                    </div>
+
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            Check Article
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('verifyForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', function() {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}

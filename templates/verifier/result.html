@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verification Result - Fake News Detector{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Result Header -->
+        <div class="card shadow mb-4">
+            <div class="card-body text-center p-4">
+                {% if result.error %}
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <h2 class="text-warning">Analysis Error</h2>
+                    <p class="lead">{{ result.error }}</p>
+                {% else %}
+                    {% if result.prediction == 'True' %}
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h2 class="text-success">Likely True News</h2>
+                        <p class="lead">This content appears to be reliable and factual.</p>
+                    {% elif result.prediction == 'Fake' %}
+                        <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
+                        <h2 class="text-danger">Likely Fake News</h2>
+                        <p class="lead">This content shows characteristics of misinformation.</p>
+                    {% elif result.prediction == 'Partially True' %}
+                        <i class="fas fa-question-circle fa-3x text-warning mb-3"></i>
+                        <h2 class="text-warning">Partially True</h2>
+                        <p class="lead">This content contains some truth but may have misleading elements.</p>
+                    {% else %}
+                        <i class="fas fa-question fa-3x text-muted mb-3"></i>
+                        <h2 class="text-muted">Unable to Determine</h2>
+                        <p class="lead">The analysis was inconclusive. Please try with more detailed content.</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        {% if not result.error %}
+            <!-- Detailed Analysis -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Analysis Result</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>
+                                <i class="fas fa-shield-alt me-2"></i>Verification Result
+                            </h6>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>Prediction:</span>
+                                <span class="badge {% if result.prediction == 'True' %}bg-success{% elif result.prediction == 'Fake' %}bg-danger{% else %}bg-warning{% endif %} fs-6">
+                                    {{ result.prediction }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>
+                                <i class="fas fa-chart-line me-2"></i>Confidence Level
+                            </h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar {% if result.confidence > 0.7 %}bg-success{% elif result.confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                     style="width: {% widthratio result.confidence 1 100 %}%">
+                                    {% widthratio result.confidence 1 100 %}%
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                Confidence: {% widthratio result.confidence 1 100 %}%
+                            </small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Category</h6>
+                            <span class="badge bg-primary">{{ category|default:"General" }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Verification Method</h6>
+                            {% if result.error and 'API key not configured' in result.error %}
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-cog me-1"></i>Demo Mode
+                                </span>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Configure NEWS_VERIFICATION_API_KEY for real verification
+                                    </small>
+                                </div>
+                            {% else %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-cloud me-1"></i>Using ML and API-Based Analysis
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Content Preview -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-file-text me-2"></i>Analyzed Content
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if title %}
+                    <h6 class="text-primary">{{ title }}</h6>
+                {% endif %}
+                <p class="mb-0">{{ content|truncatewords:50 }}</p>
+                {% if content|wordcount > 50 %}
+                    <button class="btn btn-sm btn-outline-secondary mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#fullContent">
+                        <i class="fas fa-expand me-1"></i>Show Full Content
+                    </button>
+                    <div class="collapse mt-2" id="fullContent">
+                        <p class="text-muted">{{ content }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <a href="{% url 'verifier:verify' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-plus me-2"></i>Verify Another Article
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{% url 'verifier:history' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-history me-2"></i>View History
+                        </a>
+                    </div>
+                </div>
+                
+                {% if verification_result %}
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <form method="post" action="{% url 'verifier:toggle_bookmark' verification_result.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-warning">
+                                    <i class="fas fa-bookmark me-2"></i>
+                                    {% if verification_result.is_bookmarked %}Remove Bookmark{% else %}Bookmark Result{% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Important Disclaimer -->
+        <div class="alert alert-warning">
+            <h6 class="alert-heading">
+                <i class="fas fa-exclamation-triangle me-2"></i>Important Disclaimer
+            </h6>
+            <p class="mb-0">
+                This analysis is provided by AI models and should be used as a starting point for verification. 
+                Always cross-reference with multiple reliable sources, check publication dates, and consider the 
+                reputation of the original source. Critical thinking and human judgment remain essential.
+            </p>
+        </div>
+
+        <!-- Quick Verification Form -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-rocket me-2"></i>Quick Verification
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'verifier:verify' %}">
+                    {% csrf_token %}
+                    {{ form.content }}
+                    <button type="submit" class="btn btn-primary mt-2">
+                        <i class="fas fa-search me-2"></i>Quick Analyze
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-focus on quick verification form
+document.addEventListener('DOMContentLoaded', function() {
+    const quickForm = document.querySelector('#id_content');
+    if (quickForm) {
+        quickForm.placeholder = 'Paste another article for quick verification...';
+    }
+});
+</script>
+{% endblock %}

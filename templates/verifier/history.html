@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verification History - Fake News Detector{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2">
+                    <i class="fas fa-history me-2"></i>Verification History
+                </h1>
+                <p class="text-muted mb-0">{{ total_results }} total verification{{ total_results|pluralize }}</p>
+            </div>
+            <div>
+                <a href="{% url 'verifier:verify' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Verify News
+                </a>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        {{ filter_form.result_filter.label_tag }}
+                        {{ filter_form.result_filter }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ filter_form.category_filter.label_tag }}
+                        {{ filter_form.category_filter }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ filter_form.search.label_tag }}
+                        {{ filter_form.search }}
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-1"></i>Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results -->
+        {% if page_obj %}
+            <div class="row">
+                {% for result in page_obj %}
+                    <div class="col-12 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-start">
+                                            <div class="me-3">
+                                                {% if result.prediction == 'True' %}
+                                                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                                                {% elif result.prediction == 'Fake' %}
+                                                    <i class="fas fa-times-circle fa-2x text-danger"></i>
+                                                {% else %}
+                                                    <i class="fas fa-question-circle fa-2x text-warning"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h5 class="card-title mb-2">
+                                                    {{ result.title|truncatechars:80 }}
+                                                    {% if result.is_bookmarked %}
+                                                        <i class="fas fa-bookmark text-warning ms-2"></i>
+                                                    {% endif %}
+                                                </h5>
+                                                <p class="card-text text-muted mb-2">
+                                                    {{ result.content_preview }}
+                                                </p>
+                                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-tag me-1"></i>{{ result.category }}
+                                                    </span>
+                                                    <span class="badge {% if result.prediction == 'True' %}bg-success{% elif result.prediction == 'Fake' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                        {{ result.prediction }}
+                                                    </span>
+                                                    <span class="badge bg-info">
+                                                        {% widthratio result.confidence 1 100 %}% confidence
+                                                    </span>
+                                                </div>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    {{ result.created_at|date:"M d, Y H:i" }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="d-flex flex-column gap-2 h-100 justify-content-center">
+                                            <!-- Confidence Progress -->
+                                            <div>
+                                                <small class="text-muted">Confidence Level</small>
+                                                <div class="progress" style="height: 8px;">
+                                                    <div class="progress-bar {% if result.confidence > 0.7 %}bg-success{% elif result.confidence > 0.5 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                         style="width: {% widthratio result.confidence 1 100 %}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Actions -->
+                                            {% comment %} <div class="btn-group btn-group-sm" role="group">
+                                                <form method="post" action="{% url 'verifier:toggle_bookmark' result.id %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn {% if result.is_bookmarked %}btn-warning{% else %}btn-outline-warning{% endif %}" title="{% if result.is_bookmarked %}Remove bookmark{% else %}Bookmark{% endif %}">
+                                                        <i class="fas fa-bookmark"></i>
+                                                    </button>
+                                                </form>
+                                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#details-{{ result.id }}" title="View details">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
+                                                <form method="post" action="{% url 'verifier:delete_result' result.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this result?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div> {% endcomment %}
+
+                                            <div class="btn-group btn-group-sm justify-content-end" role="group">
+                                                <!-- Bookmark Button -->
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <!-- Bookmark Button -->
+                                                    <form method="post" action="{% url 'verifier:toggle_bookmark' result.id %}" class="m-0">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm {% if result.is_bookmarked %}btn-warning{% else %}btn-outline-warning{% endif %}" title="{% if result.is_bookmarked %}Remove bookmark{% else %}Bookmark{% endif %}">
+                                                            <i class="fas fa-bookmark"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    <!-- Details Button -->
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#details-{{ result.id }}" title="View details">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
+
+                                                    <!-- Delete Button -->
+                                                    <form method="post" action="{% url 'verifier:delete_result' result.id %}" class="m-0" onsubmit="return confirm('Are you sure you want to delete this result?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Collapsible Details -->
+                                <div class="collapse mt-3" id="details-{{ result.id }}">
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Full Content</h6>
+                                            <p class="small text-muted">{{ result.content|truncatewords:100 }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Analysis Details</h6>
+                                            <div class="small">
+                                                <div class="mb-2">
+                                                    <strong>Prediction:</strong> 
+                                                    <span class="badge {% if result.prediction == 'True' %}bg-success{% elif result.prediction == 'Fake' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                        {{ result.prediction }}
+                                                    </span>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <strong>Confidence:</strong> {% widthratio result.confidence 1 100 %}%
+                                                </div>
+                                                <div class="mb-2">
+                                                    <strong>Category:</strong> {{ result.category }}
+                                                </div>
+                                                <div class="mb-2">
+                                                    <strong>Verified:</strong> {{ result.created_at|date:"F d, Y \a\t H:i" }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Verification history pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.result_filter %}&result_filter={{ request.GET.result_filter }}{% endif %}{% if request.GET.category_filter %}&category_filter={{ request.GET.category_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.result_filter %}&result_filter={{ request.GET.result_filter }}{% endif %}{% if request.GET.category_filter %}&category_filter={{ request.GET.category_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if request.GET.result_filter %}&result_filter={{ request.GET.result_filter }}{% endif %}{% if request.GET.category_filter %}&category_filter={{ request.GET.category_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.result_filter %}&result_filter={{ request.GET.result_filter }}{% endif %}{% if request.GET.category_filter %}&category_filter={{ request.GET.category_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.result_filter %}&result_filter={{ request.GET.result_filter }}{% endif %}{% if request.GET.category_filter %}&category_filter={{ request.GET.category_filter }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                <h3 class="text-muted mb-3">No verification results found</h3>
+                {% if request.GET.result_filter or request.GET.category_filter or request.GET.search %}
+                    <p class="mb-4">Try adjusting your filters to see more results.</p>
+                    <a href="{% url 'verifier:history' %}" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-times me-2"></i>Clear Filters
+                    </a>
+                {% else %}
+                    <p class="mb-4">Start by verifying your first news article!</p>
+                {% endif %}
+                <a href="{% url 'verifier:verify' %}" class="btn btn-primary">
+                    <i class="fas fa-shield-alt me-2"></i>Verify News
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Auto-submit form when filters change
+document.addEventListener('DOMContentLoaded', function() {
+    const filterSelects = document.querySelectorAll('#id_result_filter, #id_category_filter');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+});
+</script>
+{% endblock %}

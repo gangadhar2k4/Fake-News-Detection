@@ -1,0 +1,171 @@
+{% extends "index/base.html" %}
+{% block title %}Index{% endblock title %}
+{% block body %}
+
+     <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                News Checker
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'verifier:verify' %}">Check News</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'verifier:history' %}">History</a>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ user.first_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:signup' %}">
+                                <i class="fas fa-user-plus me-1"></i>Sign Up
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+<div class="container py-5">
+  <!-- Hero Section -->
+  <section class="text-center mb-5 bg-primary text-white rounded p-5">
+    <h1 class="display-4 fw-bold">Fake News Detection</h1>
+    <p class="lead">Discover amazing features and possibilities</p>
+    <div class="d-flex justify-content-center gap-3 mt-4">
+      <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg" role="button">Get Started</a>
+      <a href="#info" class="btn btn-outline-light btn-lg" role="button">Learn More</a>
+    </div>
+  </section>
+
+  <!-- Info Section -->
+  <section id="info">
+    <h2 class="text-center mb-4">Why Choose Us</h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      
+      <div class="col">
+        <div class="card h-100 text-center hover-shadow">
+          <div class="card-body">
+            <div class="display-5">🚀</div>
+            <h5 class="card-title">Fast & Efficient</h5>
+            <p class="card-text">Experience lightning-fast performance and reliable service.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card h-100 text-center hover-shadow">
+          <div class="card-body">
+            <div class="display-5">🎨</div>
+            <h5 class="card-title">Simple UI/Friendly UI</h5>
+            <p class="card-text">Provides an easy and smooth user experience.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card h-100 text-center hover-shadow">
+          <div class="card-body">
+            <div class="display-5">🔒</div>
+            <h5 class="card-title">Authentication</h5>
+            <p class="card-text">Ensures secure access and protects user data.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card h-100 text-center hover-shadow">
+          <div class="card-body">
+            <div class="display-5">✅</div>
+            <h5 class="card-title">News Authenticity</h5>
+            <p class="card-text">Verifies sources to prevent misinformation.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card h-100 text-center hover-shadow">
+          <div class="card-body">
+            <div class="display-5">🛡️</div>
+            <h5 class="card-title">Secure</h5>
+            <p class="card-text">Your data is protected with industry-leading security.</p>
+          </div>
+        </div>
+      </div>
+
+      {% comment %} <div class="col">
+        <div class="card h-100 text-center hover-shadow">
+          <div class="card-body">
+            <div class="display-5">📰</div>
+            <h5 class="card-title">Latest News</h5>
+            <p class="card-text">Delivers real-time updates on current events.</p>
+          </div>
+        </div>
+      </div> {% endcomment %}
+
+      {% comment %} <div class="col">
+        <div class="card h-100 text-center hover-shadow">
+          <div class="card-body">
+            <div class="display-5">📢</div>
+            <h5 class="card-title">Top News</h5>
+            <p class="card-text">Highlights trending and important stories.</p>
+          </div>
+        </div>
+      </div> {% endcomment %}
+
+      <div class="col">
+        <div class="card h-100 text-center hover-shadow">
+          <div class="card-body">
+            <div class="display-5">📂</div>
+            <h5 class="card-title">Multiple Categories</h5>
+            <p class="card-text">Organizes news into sections for easy browsing.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+<!-- Footer -->
+    <footer class="bg-light text-center text-muted py-4 mt-5">
+        <div class="container">
+            <p class="mb-1">
+                <i class="fas fa-shield-alt me-2"></i>
+                Fake News Detector - Powered by Machine Learning
+            </p>
+            <p class="mb-0">
+                <small>Helping you identify reliable news sources since 2025</small>
+            </p>
+        </div>
+    </footer>
+{% endblock body %}
